@@ -9,6 +9,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+import java.util.Date;
+
 @RequiredArgsConstructor
 @Component
 public class ProductHandler {
@@ -31,5 +34,23 @@ public class ProductHandler {
                                 .bodyValue(product)
                 )
                 .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> createProduct(ServerRequest serverRequest) {
+        Mono<Product> productMono = serverRequest.bodyToMono(Product.class);
+        return productMono.flatMap(product -> {
+                    if (product.getCreateAt() == null) {
+                        product.setCreateAt(new Date());
+                    }
+
+                    return productService.save(product);
+                })
+                .flatMap(product ->
+                        ServerResponse.created(URI.create("/api/client/products".concat(product.getId())))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(product))
+                .onErrorResume(error -> ServerResponse
+                        .badRequest()
+                        .bodyValue("Error in the request body or saving the product"));
     }
 }
