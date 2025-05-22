@@ -15,6 +15,9 @@ public class RouterConfig {
         return RouterFunctions.route()
                 .GET("/api/client/products", productHandler::getProducts)
                 .GET("/api/client/products/{id}", productHandler::getProductDetail)
+                .POST("/api/client/products", productHandler::createProduct)
+                .PUT("/api/client/products/{id}", productHandler::editProduct)
+                .DELETE("/api/client/products/{id}", productHandler::deleteProduct)
                 .build();
     }
 }
