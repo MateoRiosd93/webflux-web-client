@@ -3,8 +3,10 @@ package com.webflux.webclient.handler;
 import com.webflux.webclient.models.Product;
 import com.webflux.webclient.services.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -49,9 +51,17 @@ public class ProductHandler {
                         ServerResponse.created(URI.create("/api/client/products".concat(product.getId())))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(product))
-                .onErrorResume(error -> ServerResponse
-                        .badRequest()
-                        .bodyValue("Error in the request body or saving the product"));
+                .onErrorResume(error -> {
+                    WebClientResponseException responseErrorException = (WebClientResponseException) error;
+
+                    if (responseErrorException.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                        return ServerResponse.badRequest()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(responseErrorException.getResponseBodyAsString());
+                    }
+
+                    return Mono.error(responseErrorException);
+                });
     }
 
     public Mono<ServerResponse> editProduct(ServerRequest serverRequest) {
