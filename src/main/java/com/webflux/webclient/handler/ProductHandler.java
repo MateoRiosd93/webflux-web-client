@@ -20,4 +20,16 @@ public class ProductHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(productService.findAll(), Product.class);
     }
+
+    public Mono<ServerResponse> getProductDetail(ServerRequest serverRequest) {
+        String id = serverRequest.pathVariable("id");
+
+        return productService.findById(id)
+                .flatMap(product ->
+                        ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(product)
+                )
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
 }
