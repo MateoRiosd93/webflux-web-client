@@ -53,4 +53,19 @@ public class ProductHandler {
                         .badRequest()
                         .bodyValue("Error in the request body or saving the product"));
     }
+
+    public Mono<ServerResponse> editProduct(ServerRequest serverRequest) {
+        String id = serverRequest.pathVariable("id");
+        Mono<Product> productMono = serverRequest.bodyToMono(Product.class);
+
+        return productMono.flatMap(product -> productService.edit(product, id)
+                .flatMap(updateProduct ->
+                        ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(updateProduct)
+                )
+                .switchIfEmpty(ServerResponse.notFound().build())
+                .onErrorResume(error -> ServerResponse.badRequest().bodyValue("Error in the request body or editing the product"))
+        );
+    }
 }
