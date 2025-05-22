@@ -68,4 +68,10 @@ public class ProductHandler {
                 .onErrorResume(error -> ServerResponse.badRequest().bodyValue("Error in the request body or editing the product"))
         );
     }
+
+    public Mono<ServerResponse> deleteProduct(ServerRequest serverRequest){
+        String id = serverRequest.pathVariable("id");
+
+        return productService.delete(id).then(ServerResponse.noContent().build());
+    }
 }
