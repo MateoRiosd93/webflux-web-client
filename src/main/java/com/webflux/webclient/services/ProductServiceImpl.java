@@ -45,7 +45,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Mono<Product> edit(Product product, String id) {
-        return null;
+        return webClient.put()
+                .uri("/{id}", Collections.singletonMap("id", id))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(product)
+                .retrieve()
+                .bodyToMono(Product.class);
     }
 
     @Override
