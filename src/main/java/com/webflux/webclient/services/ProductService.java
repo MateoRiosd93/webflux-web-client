@@ -9,5 +9,5 @@ public interface ProductService {
     Mono<Product> findById(String id);
     Mono<Product> save(Product product);
     Mono<Product> edit(Product product, String id);
-    Mono<Void> delete(Product product);
+    Mono<Void> delete(String id);
 }
