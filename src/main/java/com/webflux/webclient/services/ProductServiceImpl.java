@@ -14,11 +14,12 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-    private final WebClient webClient;
+    // Al implementar Eureka en el WebClient usaremos el .Builder y webClient.build() en las implementaciones de los metodos.
+    private final WebClient.Builder webClient;
 
     @Override
     public Flux<Product> findAll() {
-        return webClient.get()
+        return webClient.build().get()
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToFlux(Product.class);
@@ -26,7 +27,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Mono<Product> findById(String id) {
-        return webClient.get()
+        return webClient.build().get()
                 .uri("/{id}", Collections.singletonMap("id", id))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -35,7 +36,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Mono<Product> save(Product product) {
-        return webClient.post()
+        return webClient.build().post()
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(product)
@@ -45,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Mono<Product> edit(Product product, String id) {
-        return webClient.put()
+        return webClient.build().put()
                 .uri("/{id}", Collections.singletonMap("id", id))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -56,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Mono<Void> delete(String id) {
-        return webClient.delete()
+        return webClient.build().delete()
                 .uri("/{id}", Collections.singletonMap("id", id))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
